@@ -13,8 +13,8 @@ elif [ $PLATFORM == "mac" && $(fn_exists brew) == 0 ]; then
   log_error "MacOS detected, but no brew. Cannot proceed." "This script only works with homebrew installed. Open a PR!"
 fi
 
-log_info "Installing and/or starting zsh"
-if [ !-n $ZSH_VERSION ]; then
+if [ ! -n $ZSH_VERSION ]; then
+  log_info "installing zsh"
   if [ $PLATFORM == "linux" ]; then
     sudo apt update
     sudo apt install -y git build-essential curl wget zsh
@@ -23,6 +23,7 @@ if [ !-n $ZSH_VERSION ]; then
     sudo apt dist-upgrade -y
     sudo apt autoremove -y
   elif [ $PLATFORM == "mac" ]; then
+    log_info "installing zsh"
     brew update
     brew upgrade
     brew doctor
@@ -96,7 +97,7 @@ curl -fLo ~/.config/nvim/init.vim --create-dirs \
   https://raw.githubusercontent.com/collaboratory/dotfiles/main/nvim/init.vim
 
 log "starting vim to install plugins"
-nvim +PlugInstall +UpdateRemotePlugins +qallA
+nvim +PlugInstall +UpdateRemotePlugins +qall
 
 log "copying .zsh_profile"
 curl -fLo ~/.zsh_profile \

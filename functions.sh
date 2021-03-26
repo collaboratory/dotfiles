@@ -6,22 +6,20 @@ YELLOW=$(tput setaf 122)
 WHITE=$(tput setaf 255)
 
 log () {
- echo -e "${BLUE}@collab \t${WHITE}$1\t${PURPLE}$2?${WHITE}"
+ echo -e "${BLUE}@collab \t${WHITE}$1 \t${PURPLE}$2${WHITE}"
 }
 
 log_error () {
- echo -e "${RED}ERROR \t${YELLOW}$1\t${WHITE}$2?"
+ echo -e "${RED}ERROR \t${YELLOW}$1 \t${WHITE}$2"
  exit -1
 }
 
 log_info () {
- echo -e "${BLUE}@collab \t${PURPLE}$1${WHITE}$2?"
- exit -1
+ echo -e "${BLUE}@collab \t${PURPLE}$1 \t${WHITE}$2"
 }
 
 log_success () {
- echo -e "${BLUE}@collab \t${GREEN}$1${WHITE}$2?"
- exit -1
+ echo -e "${BLUE}@collab \t${GREEN}$1 \t${WHITE}$2"
 }
 
 fn_exists() { 
