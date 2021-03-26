@@ -29,6 +29,7 @@ Plug 'morhetz/gruvbox'
 Plug 'preservim/nerdcommenter'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'tpope/vim-surround'
 
 call plug#end()
 
