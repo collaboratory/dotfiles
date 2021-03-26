@@ -104,5 +104,5 @@ curl -fLo ~/.zsh_profile \
   https://raw.githubusercontent.com/collaboratory/dotfiles/main/.zsh_profile
 
 echo "source ~/.zsh_profile" >> ~/.zshrc
-
+source ~/.zshrc
 log_success "all set."
