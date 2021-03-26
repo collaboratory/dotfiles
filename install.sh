@@ -1,43 +1,28 @@
 #!/bin/bash
+source functions.sh
 
-if [ -d "$HOME/.dotfiles" ]; then
-  echo "Dotfiles already present."
-  exit -1
-fi
-
-echo "installing collaboratory dotfiles"
-
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  PLATFORM="linux"
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-  PLATFORM="mac"
-else
-  PLATFORM="unsupported"
-fi
-echo "platform: $PLATFORM"
-
-fn_exists() { 
-  type $1 &> /dev/null && echo 1 || echo 0
-}
+log "Installing @collaboratory/dotfiles"
+log_info "Platform" $PLATFORM
 
 HAS_ZSH=$(fn_exists zsh)
 HAS_VOLTA=$(fn_exists volta)
 
-echo "Has ZSH: $HAS_ZSH"
+if [ $PLATFORM == "linux" && $(fn_exists apt) == 0 ]; then
+  log_error "Linux detected, but no apt. Cannot proceed." "This script only works for debian derivatives. Open a PR!"
+elif [ $PLATFORM == "mac" && $(fn_exists brew) == 0 ]; then
+  log_error "MacOS detected, but no brew. Cannot proceed." "This script only works with homebrew installed. Open a PR!"
+fi
 
-echo "================================="
-echo "updating & installing packages"
-if [ -n $ZSH_VERSION ]; then
-  echo "zsh detected"
-else
-  if [ PLATFORM == "linux" ]; then
+log_info "Installing and/or starting zsh"
+if [ !-n $ZSH_VERSION ]; then
+  if [ $PLATFORM == "linux" ]; then
     sudo apt update
     sudo apt install -y git build-essential curl wget zsh
     sudo apt remove -y nodejs
     sudo apt upgrade -y
     sudo apt dist-upgrade -y
     sudo apt autoremove -y
-  elif [ PLATFORM == "mac" ]; then
+  elif [ $PLATFORM == "mac" ]; then
     brew update
     brew upgrade
     brew doctor
@@ -46,54 +31,77 @@ else
     brew install zsh curl
   fi
 
+  log_info "starting zsh"
   zsh
 fi
 
 if [ -d "$HOME/.oh-my-zsh" ]; then
-  echo "oh-my-zsh detected"
+  log_info "oh-my-zsh detected"
 else
-  echo "installing oh-my-zsh"
+  log "installing oh-my-zsh"
   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   source ~/.zshrc
 fi
 
 if [ $(fn_exists volta) == 1 ]; then
-  echo "volta detected"
+  log_info "volta detected"
   volta install node
   volta install yarn
 else
-  echo "installing volta"
+  log "installing volta"
   curl https://get.volta.sh | bash
   source ~/.zshrc
-  echo "installing node & yarn in volta"
+  log "installing node & yarn in volta"
   volta install node
   volta install yarn
 fi
 
-if [ $(fn_exists nvim) ]; then
-  echo "neovim detected"
+if [ $(fn_exists nvim) == 1 ]; then
+  log_info "neovim detected"
 else
-  echo "installing neovim"
-  if [ PLATFORM == "linux" ]; then
+  log "installing neovim"
+  if [ $PLATFORM == "linux" ]; then
     sudo apt install -y neovim
-  elif [PLATFORM == "mac" ]; then
+  elif [ $PLATFORM == "mac" ]; then
     brew install --HEAD neovim
+    pip3 install neovim
   fi
 fi
 
+if [ $(fn_exists python3) == 0 ]; then
+  log "Installing python"
+  if [ $PLATFORM == "linux" ]; then
+    sudo apt install -y python3
+  elif [ $PLATFORM == "mac" ]; then
+    brew install python3
+  fi
+fi
+
+
 if [ -f "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim ]; then
-  echo "vim-plug detected"
+  log_info "vim-plug detected"
 else
-  echo "installing vim-plug"
+  log "installing vim-plug"
   curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
 if [ -f "$HOME"/.config/nvim/init.vim ]; then
-  echo "~/.config/nvim/init.vim already exists; renaming to ~/.config/nvim/init.vim.$EPOCHSECONDS"
+  log_info "~/.config/nvim/init.vim already exists; renaming to ~/.config/nvim/init.vim.$EPOCHSECONDS"
   mv ~/.config/nvim/init.vim ~/.config/nvim/init.vim.$EPOCHSECONDS
 fi
 
-echo "copying init.vim"
+log "copying vim configuration"
 curl -fLo ~/.config/nvim/init.vim --create-dirs \
-  https://raw.githubusercontent.com/collaboratory/dotfiles/main/init.vim
+  https://raw.githubusercontent.com/collaboratory/dotfiles/main/nvim/init.vim
+
+log "starting vim to install plugins"
+nvim +PlugInstall +UpdateRemotePlugins +qallA
+
+log "copying .zsh_profile"
+curl -fLo ~/.zsh_profile \
+  https://raw.githubusercontent.com/collaboratory/dotfiles/main/.zsh_profile
+
+echo "source ~/.zsh_profile" >> ~/.zshrc
+
+log_success "all set."

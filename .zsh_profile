@@ -1,0 +1,6 @@
+alias vi=nvim
+alias vim=nvim
+alias viconfig=nvim ~/.config/nvim/init.vim
+alias dotfileupdate='sh -c "$(curl -fsSL https://raw.github.com/collaboratory/dotfiles/main/install.sh)"'
+alias code=/usr/local/bin/code-insiders
+alias vsc=/usr/local/bin/code-insiders
