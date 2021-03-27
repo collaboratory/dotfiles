@@ -29,7 +29,7 @@ if [ ! -n $ZSH_VERSION ]; then
     brew doctor
     brew cleanup
     brew uninstall nodejs
-    brew install zsh curl
+    brew install zsh curl exa
   fi
 
   log_info "starting zsh"
