@@ -7,12 +7,6 @@ log_info "Platform" $PLATFORM
 HAS_ZSH=$(fn_exists zsh)
 HAS_VOLTA=$(fn_exists volta)
 
-if [ $PLATFORM == "linux" && $(fn_exists apt) == 0 ]; then
-  log_error "Linux detected, but no apt. Cannot proceed." "This script only works for debian derivatives. Open a PR!"
-elif [ $PLATFORM == "mac" && $(fn_exists brew) == 0 ]; then
-  log_error "MacOS detected, but no brew. Cannot proceed." "This script only works with homebrew installed. Open a PR!"
-fi
-
 if [ ! -n $ZSH_VERSION ]; then
   log_info "installing zsh"
   if [ $PLATFORM == "linux" ]; then
@@ -41,7 +35,6 @@ if [ -d "$HOME/.oh-my-zsh" ]; then
 else
   log "installing oh-my-zsh"
   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  source ~/.zshrc
 fi
 
 if [ $(fn_exists volta) == 1 ]; then
@@ -93,16 +86,14 @@ if [ -f "$HOME"/.config/nvim/init.vim ]; then
 fi
 
 log "copying vim configuration"
-curl -fLo ~/.config/nvim/init.vim --create-dirs \
-  https://raw.githubusercontent.com/collaboratory/dotfiles/main/nvim/init.vim
+ln -s ./nvim/init.vim ~/.config/nvim/init.vim
 
 log "starting vim to install plugins"
 nvim +PlugInstall +UpdateRemotePlugins +qall
+nvim +CocInstall +qall
 
 log "copying .zsh_profile"
-curl -fLo ~/.zsh_profile \
-  https://raw.githubusercontent.com/collaboratory/dotfiles/main/.zsh_profile
+cp .zsh_profile ~/.zsh_profile
 
-echo "source ~/.zsh_profile" >> ~/.zshrc
-source ~/.zshrc
 log_success "all set."
+zsh

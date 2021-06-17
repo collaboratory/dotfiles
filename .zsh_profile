@@ -4,3 +4,6 @@ alias viconfig=nvim ~/.config/nvim/init.vim
 alias dotfileupdate='sh -c "$(curl -fsSL https://raw.github.com/collaboratory/dotfiles/main/install.sh)"'
 alias code=/usr/local/bin/code-insiders
 alias vsc=/usr/local/bin/code-insiders
+
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
